@@ -1,0 +1,31 @@
+---
+import Base from "@layouts/Base.astro";
+import type { GetStaticPaths } from "astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+
+export const getStaticPaths = (async () => {
+    const episodes: CollectionEntry<"episodes">[] =
+        await getCollection("episodes");
+
+    return episodes.map((item) => ({
+        params: {
+            episode: item.data.episode,
+            //cast is necessary because of a bug in Astro
+            season: (item.data.season as { id: string }).id,
+        },
+        props: { item },
+    }));
+}) satisfies GetStaticPaths;
+
+export type Props = {
+    item: CollectionEntry<"episodes">;
+};
+
+const { item } = Astro.props;
+---
+
+<Base title={item.data.title}>
+    <main>
+        <h1>{item.data.title}</h1>
+    </main>
+</Base>
